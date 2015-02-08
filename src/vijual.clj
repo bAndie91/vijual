@@ -1,6 +1,5 @@
 (ns vijual
-  (:use clojure.contrib.math)
-  (:use clojure.contrib.seq-utils)
+  (:require [clojure.math.numeric-tower :refer [floor abs ceil]])
   (:import (java.io File)
            (javax.imageio ImageIO)
            (java.awt Color)
@@ -9,6 +8,11 @@
 ;;Maintained By Conrad Barski- Licensed under GPLV3
 
 ;; Common functions to all layout algorithms
+
+(defn positions
+  "Returns indices idx of sequence s where (f (nth s idx))"
+  [f s]
+    (keep-indexed (fn [i x] (when (f x) i)) s))
 
 (defn half [x]
   (/ x 2))
@@ -488,8 +492,8 @@
 (defn shuffle-nodes
   "Randomly swaps two nodes of the graph"
   [pos nodes]
-  (let [a (rand-elt nodes)
-        b (rand-elt nodes)
+  (let [a (rand-nth nodes)
+        b (rand-nth nodes)
         an (pos a)
         bn (pos b)]
     (merge pos 
