@@ -1,4 +1,4 @@
-(defproject vijual "0.2.1"
+(defproject mikos/vijual "0.2.1"
   :description "A Graph Layout Library For Clojure"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/math.numeric-tower "0.0.4"]]
