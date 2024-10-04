@@ -1,6 +1,5 @@
 (ns vijual
-  (:use clojure.contrib.math)
-  (:use clojure.contrib.seq-utils)
+  (:require [clojure.math.numeric-tower :as math])
   (:import (java.io File)
            (javax.imageio ImageIO)
            (java.awt Color)
@@ -9,6 +8,9 @@
 ;;Maintained By Conrad Barski- Licensed under GPLV3
 
 ;; Common functions to all layout algorithms
+
+(defn positions [pred coll]
+  (keep-indexed (fn [idx x] (when (pred x) idx)) coll))
 
 (defn half [x]
   (/ x 2))
@@ -24,9 +26,9 @@
   "Takes a sequence of shapes and 'rounds off' all the dimensions so that it can be displayed in ASCII"
   [shapes]
   (map (fn [{:keys [x y width height type] :as item}]
-         (let [nu-x (int (floor x))
-               nu-y (int (floor y))]
-           (assoc item :x nu-x :y nu-y :width (- (int (floor (+ x width))) nu-x) :height (- (int (floor (+ y height))) nu-y))))
+         (let [nu-x (int (math/floor x))
+               nu-y (int (math/floor y))]
+           (assoc item :x nu-x :y nu-y :width (- (int (math/floor (+ x width))) nu-x) :height (- (int (math/floor (+ y height))) nu-y))))
        shapes))
 
 (defn rect-relation
@@ -436,8 +438,8 @@
                   (mapcat (fn [{:keys [legs dest arrow]}]
                             (let [shapes (map (fn [{x1 :xpos y1 :ypos dir1 :dir} {x2 :xpos y2 :ypos dir2 :dir}]
                                                 (if (or (horizontal dir1) (vertical dir2))
-                                                  {:type :rect :x (min x1 x2) :y (min y1 y2) :width (+ (abs (- x2 x1)) line-wid) :height line-wid}
-                                                  {:type :rect :x (min x1 x2) :y (min y1 y2) :width line-wid :height (+ (abs (- y2 y1)) line-wid)}))
+                                                  {:type :rect :x (min x1 x2) :y (min y1 y2) :width (+ (math/abs (- x2 x1)) line-wid) :height line-wid}
+                                                  {:type :rect :x (min x1 x2) :y (min y1 y2) :width line-wid :height (+ (math/abs (- y2 y1)) line-wid)}))
                                               legs
                                               (next legs))
                                   first-leg (first legs)
@@ -477,19 +479,19 @@
          (map (fn [[f t]]
                 (let [{fx :x fy :y} (pos f)
                       {tx :x ty :y} (pos t)]
-                  (+ (abs (- fx tx)) (abs (- fy ty)))))
+                  (+ (math/abs (- fx tx)) (math/abs (- fy ty)))))
               edges)))
 
 (defn get-side
   "All graphs currently start as logically square. This function therefore calculates length of side with the sqrt funciton."
   [col]
-  (int (ceil (Math/sqrt (count col)))))
+  (int (math/ceil (Math/sqrt (count col)))))
 
 (defn shuffle-nodes
   "Randomly swaps two nodes of the graph"
   [pos nodes]
-  (let [a (rand-elt nodes)
-        b (rand-elt nodes)
+  (let [a (rand-nth nodes)
+        b (rand-nth (remove #(= % a) nodes)) ; Ensure b is different from a
         an (pos a)
         bn (pos b)]
     (merge pos 
@@ -530,7 +532,7 @@
          (map (fn [[f t]]
                 (let [{fx :x fy :y} (pos f)
                       {tx :x ty :y} (pos t)]
-                  (* (+ (abs (- fx tx)) (abs (- fy ty)))
+                  (* (+ (math/abs (- fx tx)) (math/abs (- fy ty)))
                      (cond (> fy ty) 2
                            (= fy ty) 1
                            true 1))))
@@ -883,7 +885,7 @@
                                          {xpos1 :xpos} (legs leg-index)
                                          {xpos2 :xpos} (legs (inc leg-index))
                                          xpos (min xpos1 xpos2)
-                                         width (+ (abs (- xpos2 xpos1)) line-wid)
+                                         width (+ (math/abs (- xpos2 xpos1)) line-wid)
                                          nuy (scan-lowest-y scan xpos width)
                                          f (fn [nodes i]
                                              (assoc-in nodes (concat path [i :ypos]) nuy))]
@@ -938,7 +940,7 @@
                  [key (map second items)])
                (group-by first
                          (map (fn [[{xpos1 :xpos ypos :ypos} {xpos2 :xpos}]]
-                                    [(int (floor ypos)) [(int (floor (min xpos1 xpos2))) (int (floor (max xpos1 xpos2)))]])
+                                    [(int (math/floor ypos)) [(int (math/floor (min xpos1 xpos2))) (int (math/floor (max xpos1 xpos2)))]])
                               (filter (fn [[{dir :dir} {}]]
                                         (horizontal dir))
                                       (map vector lst (next lst)))))))))
@@ -949,7 +951,7 @@
   (> 2 
      (count (filter (fn [[xx1 xx2]]
                       (not (or (<= xx2 x1) (>= xx1 x2))))
-                    (linemap (int (floor y)))))))
+                    (linemap (int (math/floor y)))))))
 
 (defn remove-zigzags 
   "Nodes that are adjacent are connected by a 'zigzag' line for most of the algorithms, so that they have some 'give'. This function removes any zigzags for cases where nodes are close enough to be connected by just a straight line."
@@ -1163,7 +1165,7 @@
         (.fillRect graphics (+ x line-wid) (+ y line-wid) (- width (* line-wid 2)) (- height (* line-wid 2)))
         (.setColor graphics (Color. 0 0 0))
         (doseq [[s n] (map vector (seq text) (iterate inc 0))]
-          (.drawString graphics s (floor (+ 2 x)) (floor (+ y 8 (* n 10)))))))
+          (.drawString graphics s (math/floor (+ 2 x)) (math/floor (+ y 8 (* n 10)))))))
     (doseq [{:keys [type x y width height dir]} shapes]
       (when (= type :arrow)
         (.setColor graphics (Color. 255 255 255))
