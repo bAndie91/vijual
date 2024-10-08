@@ -9,8 +9,12 @@
 
 ;; Common functions to all layout algorithms
 
-(defn positions [pred coll]
-  (keep-indexed (fn [idx x] (when (pred x) idx)) coll))
+(defn positions
+  "Returns a lazy sequence containing the positions at which pred
+  is true for items in coll."
+  [pred coll]
+  (map first (filter (comp pred second) 
+                     (map-indexed vector coll))))
 
 (defn half [x]
   (/ x 2))
