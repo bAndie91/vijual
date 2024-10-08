@@ -851,7 +851,7 @@
                                           nodes (update-in nodes 
                                                            [key :links] 
                                                            (fn [links]
-                                                             (vec (map (fn [{[{:keys [dir ypos]} & {}] :legs :as link}]
+                                                             (vec (map (fn [{[{:keys [dir ypos]}] :legs :as link}]
                                                                          (assoc-in link
                                                                                    [:legs 0 :ypos] 
                                                                                    (cond (horizontal dir) ypos
