@@ -119,9 +119,13 @@
                                       :left \━
                                       :up \┃
                                       :down \┃)
-                               :rect (if (< y ypos)
-                                         (if (< x @xcur) \┛ \┗)
-                                         (if (< x @xcur) \┓ \┏)))
+                               :rect (if (= 1 width)
+                                         (if (> x @xcur)
+                                             (if (< y ypos) \┗ \┏)
+                                             (if (< y ypos) \┛ \┓))
+                                         (if (< y ypos)
+                                             (if (< x @xcur) \┛ \┗)
+                                             (if (< x @xcur) \┓ \┏))))
                              (fill \━ (- width 2))
                              (when (> width 1)
                                (if (>= y ypos)
