@@ -109,27 +109,31 @@
               (let [s (if (= :on (rect-relation ypos shape))
                         (str (condp = type 
                                :arrow (condp = dir
-                                        :right \>
-                                        :left \<
-                                        :up \^
-                                        :down \V
+                                        :right \▶
+                                        :left \◀
+                                        :up \▲
+                                        :down \▼
                                         \*)
                                :cap (condp = dir
-                                      :right \-
-                                      :left \-
-                                      :up \|
-                                      :down \|)
-                               \+)
-                             (fill \- (- width 2))
+                                      :right \━
+                                      :left \━
+                                      :up \┃
+                                      :down \┃)
+                               :rect (if (< y ypos)
+                                         (if (< x @xcur) \┛ \┗)
+                                         (if (< x @xcur) \┓ \┏)))
+                             (fill \━ (- width 2))
                              (when (> width 1)
-                               \+))
-                        (str \|
+                               (if (>= y ypos)
+                                   \┓
+                                   \┛)))
+                        (str \┃
                              (when (> width 1)
                                (let [index (- ypos y 1)
                                      s (if (>= index (count text))
                                          ""
                                          (text index))]
-                                 (str s (fill \space (- width (count s) 2)) \|)))))
+                                 (str s (fill \space (- width (count s) 2)) \┃)))))
                     [overlapping s] (let [[x2 width2] (loop [k more]
                                                         (when-let [[{x2 :x width2 :width on-top2 :on-top} & more] (seq k)]
                                                           (when (<= x2 (+ x width))
