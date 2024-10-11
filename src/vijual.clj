@@ -1,11 +1,49 @@
 (ns vijual
   (:require [clojure.math.numeric-tower :as math])
   (:import (java.io File)
+           (java.io ByteArrayOutputStream)
            (javax.imageio ImageIO)
            (java.awt Color)
-           (java.awt.image BufferedImage)))
+           (java.awt.image BufferedImage))
+  (:gen-class))
 
 ;;Maintained By Conrad Barski- Licensed under GPLV3
+
+;; the next few function is to invoke vijual functions from java command line
+
+(defn to-int [s]
+  (try
+    (Integer/parseInt s)
+    (catch NumberFormatException e s)))	;; If it can't be parsed as an integer, return the original string.
+
+(defn to-vector [s]
+  (if (and (string? s) (.startsWith s "["))
+      (vec (read-string s))	;; Turn a string like "[1 2 3]" into a vector.
+      s))
+
+(defn convert-arg [arg]
+  (-> arg
+      to-int      ;; Try to convert the argument to an integer if possible.
+      to-vector)) ;; Try to convert the argument to a vector if it's in the correct format.
+
+(defn output-image-raw [img]
+  (let [file (ByteArrayOutputStream.)]
+    (ImageIO/write (cast java.awt.image.BufferedImage img) "png" file)
+    (.write System/out (.toByteArray file))))
+
+(defn invoke-function [fn-name & args]
+  (let [fn (resolve (symbol (str "vijual/" fn-name)))	;; Look up the function dynamically by name.
+       converted-args (map convert-arg args)]	;; Convert arguments to appropriate types.
+    (let [fn-result 
+                 (apply fn converted-args)	;; Apply the function with the converted arguments.
+         ]
+         (if (instance? BufferedImage fn-result)
+             (output-image-raw fn-result))
+  )))
+
+(defn -main
+  [& args]
+  (apply invoke-function args))
 
 ;; Common functions to all layout algorithms
 
