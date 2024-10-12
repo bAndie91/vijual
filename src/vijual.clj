@@ -21,10 +21,17 @@
       (vec (read-string s))	;; Turn a string like "[1 2 3]" into a vector.
       s))
 
+;; Function to convert a string that looks like a map into a Clojure map
+(defn to-map [s]
+  (if (and (string? s) (.startsWith s "{"))
+      (read-string s)	;; Turn a string like "{:a \"lorem ipsum\" :b \"dolor sit\"}" into a map.
+      s))	;; Return the original argument if it isn't a map-like string.
+
 (defn convert-arg [arg]
   (-> arg
-      to-int      ;; Try to convert the argument to an integer if possible.
-      to-vector)) ;; Try to convert the argument to a vector if it's in the correct format.
+      to-int	;; Try to convert the argument to an integer if possible.
+      to-vector	;; Try to convert the argument to a vector if it's in the correct format.
+      to-map))
 
 (defn output-image-raw [img]
   (let [file (ByteArrayOutputStream.)]
