@@ -6,6 +6,16 @@ Vijual is a graph layout engine conceptually similar to graphviz. However, it us
 
 Vijual is easy to install through the use of leiningen and clojars. To learn how to use leiningen refer to the documentation available at the leiningen home page. Then, simply include [vijual "0.1.0-SNAPSHOT"] as a dependency in your project.clj to include this library in your programs. You can also access the source of Vijual on github.
 
+## Functions
+
+- draw-tree
+- draw-tree-image
+- draw-graph
+- draw-graph-image
+- draw-directed-graph
+- draw-directed-graph-image
+- draw-binary-tree
+
 ## Install Case Study
 
 This is an insertion from someone who found `vijual` in 2024 
