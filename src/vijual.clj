@@ -1136,15 +1136,15 @@
       (when (seq rows)
         (let [row (first rows)]
           (doseq [[ind w str] row]
-            (out (fill \space ind) \+ (fill \- (- w 2)) \+))
+            (out (fill \space ind) \┏ (fill \━ (- w 2)) \┓))
           (newline)
           (doseq [[ind w str] row]
             (dotimes [i ind]
               (out \space))
-            (out "| " (label-text str) " |"))
+            (out "┃ " (label-text str) " ┃"))
           (newline)
           (doseq [[ind w str] row]
-            (out (fill \space ind) \+ (fill \- (- w 2)) \+))
+            (out (fill \space ind) \┗ (fill \━ (- w 2)) \┛))
           (newline)
           (when (seq (rest rows))
             (let [li (line-info-btree row (first (rest rows)))]
@@ -1153,19 +1153,19 @@
                       :space (sp n)
                       :lbottom (sp)
                       :line (out (fill \_ n))
-                      :ltop (out (fill \/))
-                      :rtop (out (fill \\))
+                      :ltop (out (fill \╱))
+                      :rtop (out (fill \╲))
                       :rbottom (sp)
                       :nop nil))
               (newline)
               (doseq [[type n] li]
                 (condp = type
                       :space (sp n)
-                      :lbottom (out (fill \/))
+                      :lbottom (out (fill \╱))
                       :line (sp n)
                       :ltop (sp)
                       :rtop (sp)
-                      :rbottom (out (fill \\))
+                      :rbottom (out (fill \╲))
                       :nop nil))
               (newline))))
         (recur (rest rows))))))
