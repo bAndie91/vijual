@@ -103,7 +103,7 @@
                                         (rect-relation ypos shape))
                                       shapes))]
       (loop [shapes sorted-shapes]
-        (when-let [[{:keys [x y width text type dir on-top] :as shape} & more] (seq shapes)]
+        (when-let [[{:keys [x y width height text type dir on-top] :as shape} & more] (seq shapes)]
           (do (when (<= @xcur x)
                 (print (fill \space (- x @xcur))))
               (let [s (if (= :on (rect-relation ypos shape))
@@ -122,7 +122,9 @@
                                :rect (if (= 1 width)
                                          (if (> x @xcur)
                                              (if (< y ypos) \┗ \┏)
-                                             (if (< y ypos) \┛ \┓))
+                                             (if (< y ypos) 
+                                                 \┛
+                                                 (if (= 1 height) \┃ \┓)))
                                          (if (< y ypos)
                                              (if (< x @xcur) \┛ \┗)
                                              (if (< x @xcur) \┓ \┏))))
