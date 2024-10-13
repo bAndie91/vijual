@@ -108,11 +108,13 @@
                                 (or (< (a :x) (b :x)) (and (= (a :x) (b :x)) (< (a :width) (b :width))) (and (= (a :x) (b :x)) (= (a :width) (b :width)) (> (a :height) (b :height)))))
                               (filter (fn [shape]
                                         (rect-relation ypos shape))
-                                      shapes))]
+                                      shapes))
+          shapes-text (atom "")]
       (loop [shapes sorted-shapes]
+        (when-not (seq shapes) (print (clojure.string/replace (clojure.string/replace @shapes-text "┛━" "┻━") "┓━" "┳━")))
         (when-let [[{:keys [x y width height text type dir on-top] :as shape} & more] (seq shapes)]
           (do (when (<= @xcur x)
-                (print (fill \space (- x @xcur))))
+                (swap! shapes-text str (fill \space (- x @xcur))))
               (let [s (if (= :on (rect-relation ypos shape))
                         (str (condp = type 
                                :arrow (condp = dir
@@ -155,15 +157,17 @@
                                                               (recur more)))))]
                                       (if x2
                                         [(< (+ x2 width2) (+ x width)) (apply str (take (- x2 x) s))]
-                                        [false s]))]
-                (print (if (< x @xcur)
-                         (apply str (drop (- @xcur x) s))
-                         s))
+                                        [false s]))
+                    shapes-text-portion (if (< x @xcur)
+                                         (apply str (drop (- @xcur x) s))
+                                         s)]
+;                (print shapes-text-portion)
+                (swap! shapes-text str shapes-text-portion)
                 (compare-and-set! xcur @xcur (max (+ x (count s)) @xcur))
                 (recur (if overlapping
                          (concat [(first more) shape] (next more))
-                         more)))))))
-    (prn)))
+                         more))))))
+    (prn))))
 
 (defn out 
   "like 'print' but without inserted spaces and fully flushed"

@@ -2,8 +2,7 @@
 PREFIX = /usr
 
 .PHONY: default
-default:
-	false
+default: target/vijual-0.1.0-standalone.jar
 
 .PHONY: install
 install: $(PREFIX)/bin/vijual
