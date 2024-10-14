@@ -60,21 +60,21 @@ Created /home/hband/src/vijual/target/vijual-0.1.0-standalone.jar
 ```
 ```
 $ java -jar target/vijual-0.1.0-standalone.jar draw-directed-graph "[[:a :b] [:b :c] [:c :d] [:d :e] [:e :f] [:f :a]]"
-+---+   +---+   +---+
-| f |   |   |   |   |
-|   |-->| a |-->| b |
-|   |   |   |   |   |
-+---+   |   |   |   |
-  ^     |   |   |   |
-  |     +---+   +---+
-  |               |
-+-----+   +---+   +-+
-|  e  |   |   |     V
-|     |<--| d |   +---+
-|     |   |   |   | c |
-+-----+   |   |<--|   |
-          |   |   |   |
-          +---+   +---+
+╭───╮   ╭───╮   ╭───╮
+│ f │   │   │   │   │
+│   │━━▶│ a │━━▶│ b │
+│   │   │   │   │   │
+╰───╯   │   │   │   │
+  ▲     │   │   │   │
+  ┃     ╰───╯   ╰───╯
+  ┃               ┃
+╭─────╮   ╭───╮   ┗━┓
+│  e  │   │   │     ▼
+│     │◀━━│ d │   ╭───╮
+│     │   │   │   │ c │
+╰─────╯   │   │◀━━│   │
+          │   │   │   │
+          ╰───╯   ╰───╯
 ```
 ```
 $ java -jar target/vijual-0.1.0-standalone.jar draw-directed-graph-image "[[:a :b] [:b :c] [:c :d] [:d :e] [:e :f] [:f :a]]" > /tmp/graph.png
