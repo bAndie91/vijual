@@ -52,6 +52,36 @@
   [& args]
   (apply invoke-function args))
 
+;; Define box drawing chars
+
+(def char-line-horiz  \━)
+(def char-line-vertic \┃)
+(def char-border-horiz  \─)
+(def char-border-vertic \│)
+(def char-arrow-left    \◀)
+(def char-arrow-right   \▶)
+(def char-arrow-up      \▲)
+(def char-arrow-down    \▼)
+(def char-bow-top-left     \┏)
+(def char-bow-top-right    \┓)
+(def char-bow-bottom-left  \┗)
+(def char-bow-bottom-right \┛)
+(def char-corner-top-left     \╭)
+(def char-corner-top-right    \╮)
+(def char-corner-bottom-left  \╰)
+(def char-corner-bottom-right \╯)
+(def char-junction-horiz-up     \┻)
+(def char-junction-horiz-down   \┳)
+(def char-junction-vertic-left  \┫)
+(def char-junction-vertic-right \┣)
+(def char-shaft-horiz-up     \┸)
+(def char-shaft-horiz-down   \┰)
+(def char-shaft-vertic-left  \┥)
+(def char-shaft-vertic-right \┝)
+(def char-diagonal-NE-SW \╱)
+(def char-diagonal-NW-SE \╲)
+
+
 ;; Common functions to all layout algorithms
 
 (defn positions
@@ -111,44 +141,57 @@
                                       shapes))
           shapes-text (atom "")]
       (loop [shapes sorted-shapes]
-        (when-not (seq shapes) (print (clojure.string/replace (clojure.string/replace @shapes-text "┛━" "┻━") "┓━" "┳━")))
+        (when-not (seq shapes) (print 
+            (clojure.string/replace 
+              (clojure.string/replace
+                (clojure.string/replace
+                  (clojure.string/replace
+                    @shapes-text 
+                    (str char-bow-bottom-right char-border-horiz) (str char-shaft-horiz-up char-border-horiz))
+                  (str char-bow-top-right char-border-horiz) (str char-shaft-horiz-down char-border-horiz))
+                (str char-bow-bottom-right char-line-horiz) (str char-junction-horiz-up char-line-horiz))
+              (str char-bow-top-right char-line-horiz) (str char-junction-horiz-down char-line-horiz))))
         (when-let [[{:keys [x y width height text type dir on-top] :as shape} & more] (seq shapes)]
           (do (when (<= @xcur x)
                 (swap! shapes-text str (fill \space (- x @xcur))))
               (let [s (if (= :on (rect-relation ypos shape))
                         (str (condp = type 
                                :arrow (condp = dir
-                                        :right \▶
-                                        :left \◀
-                                        :up \▲
-                                        :down \▼
+                                        :right char-arrow-right
+                                        :left char-arrow-left
+                                        :up char-arrow-up
+                                        :down char-arrow-down
                                         \*)
                                :cap (condp = dir
-                                      :right \━
-                                      :left \━
-                                      :up \┃
-                                      :down \┃)
+                                      :right char-line-horiz
+                                      :left char-line-horiz
+                                      :up char-line-vertic
+                                      :down char-line-vertic)
                                :rect (if (= 1 width)
                                          (if (> x @xcur)
-                                             (if (< y ypos) \┗ \┏)
+                                             (if (< y ypos) char-bow-bottom-left char-bow-top-left)
                                              (if (< y ypos) 
-                                                 \┛
-                                                 (if (= 1 height) \┃ \┓)))
+                                                 char-bow-bottom-right
+                                                 (if (= 1 height) char-line-vertic char-bow-top-right)))
                                          (if (< y ypos)
-                                             (if (< x @xcur) \┛ \┗)
-                                             (if (< x @xcur) \┓ \┏))))
-                             (fill \━ (- width 2))
+                                             (if (< x @xcur) char-corner-bottom-right char-corner-bottom-left)
+                                             (if (< x @xcur) char-corner-top-right char-corner-top-left))))
+                             (fill (if (= 1 height)
+                                    char-line-horiz
+                                    char-border-horiz) (- width 2))
                              (when (> width 1)
                                (if (>= y ypos)
-                                   \┓
-                                   \┛)))
-                        (str \┃
-                             (when (> width 1)
+                                   (if (= height 1)
+                                       char-bow-top-right
+                                       char-corner-top-right)
+                                   char-corner-bottom-right)))
+                        (str (if (> width 1)
                                (let [index (- ypos y 1)
                                      s (if (>= index (count text))
                                          ""
                                          (text index))]
-                                 (str s (fill \space (- width (count s) 2)) \┃)))))
+                                 (str char-border-vertic s (fill \space (- width (count s) 2)) char-border-vertic))
+                               char-line-vertic)))
                     [overlapping s] (let [[x2 width2] (loop [k more]
                                                         (when-let [[{x2 :x width2 :width on-top2 :on-top} & more] (seq k)]
                                                           (when (<= x2 (+ x width))
@@ -1147,15 +1190,15 @@
       (when (seq rows)
         (let [row (first rows)]
           (doseq [[ind w str] row]
-            (out (fill \space ind) \┏ (fill \━ (- w 2)) \┓))
+            (out (fill \space ind) char-corner-top-left (fill char-border-horiz (- w 2)) char-corner-top-right))
           (newline)
           (doseq [[ind w str] row]
             (dotimes [i ind]
               (out \space))
-            (out "┃ " (label-text str) " ┃"))
+            (out char-border-vertic \space (label-text str) \space char-border-vertic))
           (newline)
           (doseq [[ind w str] row]
-            (out (fill \space ind) \┗ (fill \━ (- w 2)) \┛))
+            (out (fill \space ind) char-corner-bottom-left (fill char-border-horiz (- w 2)) char-corner-bottom-right))
           (newline)
           (when (seq (rest rows))
             (let [li (line-info-btree row (first (rest rows)))]
@@ -1164,19 +1207,19 @@
                       :space (sp n)
                       :lbottom (sp)
                       :line (out (fill \_ n))
-                      :ltop (out (fill \╱))
-                      :rtop (out (fill \╲))
+                      :ltop (out (fill char-diagonal-NE-SW))
+                      :rtop (out (fill char-diagonal-NW-SE))
                       :rbottom (sp)
                       :nop nil))
               (newline)
               (doseq [[type n] li]
                 (condp = type
                       :space (sp n)
-                      :lbottom (out (fill \╱))
+                      :lbottom (out (fill char-diagonal-NE-SW))
                       :line (sp n)
                       :ltop (sp)
                       :rtop (sp)
-                      :rbottom (out (fill \╲))
+                      :rbottom (out (fill char-diagonal-NW-SE))
                       :nop nil))
               (newline))))
         (recur (rest rows))))))
