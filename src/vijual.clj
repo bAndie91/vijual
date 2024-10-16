@@ -64,10 +64,10 @@
     (def char-arrow-right   \▶)
     (def char-arrow-up      \▲)
     (def char-arrow-down    \▼)
-    (def char-bow-top-left     \┏)
-    (def char-bow-top-right    \┓)
-    (def char-bow-bottom-left  \┗)
-    (def char-bow-bottom-right \┛)
+    (def char-elbow-top-left     \┏)
+    (def char-elbow-top-right    \┓)
+    (def char-elbow-bottom-left  \┗)
+    (def char-elbow-bottom-right \┛)
     (def char-corner-top-left     \╭)
     (def char-corner-top-right    \╮)
     (def char-corner-bottom-left  \╰)
@@ -92,10 +92,10 @@
     (def char-arrow-right   \>)
     (def char-arrow-up      \^)
     (def char-arrow-down    \V)
-    (def char-bow-top-left     \+)
-    (def char-bow-top-right    \+)
-    (def char-bow-bottom-left  \+)
-    (def char-bow-bottom-right \+)
+    (def char-elbow-top-left     \+)
+    (def char-elbow-top-right    \+)
+    (def char-elbow-bottom-left  \+)
+    (def char-elbow-bottom-right \+)
     (def char-corner-top-left     \+)
     (def char-corner-top-right    \+)
     (def char-corner-bottom-left  \+)
@@ -179,10 +179,10 @@
                 (clojure.string/replace
                   (clojure.string/replace
                     @shapes-text 
-                    (str char-bow-bottom-right char-border-horiz) (str char-shaft-horiz-up char-border-horiz))
-                  (str char-bow-top-right char-border-horiz) (str char-shaft-horiz-down char-border-horiz))
-                (str char-bow-bottom-right char-line-horiz) (str char-junction-horiz-up char-line-horiz))
-              (str char-bow-top-right char-line-horiz) (str char-junction-horiz-down char-line-horiz))))
+                    (str char-elbow-bottom-right char-border-horiz) (str char-shaft-horiz-up char-border-horiz))
+                  (str char-elbow-top-right char-border-horiz) (str char-shaft-horiz-down char-border-horiz))
+                (str char-elbow-bottom-right char-line-horiz) (str char-junction-horiz-up char-line-horiz))
+              (str char-elbow-top-right char-line-horiz) (str char-junction-horiz-down char-line-horiz))))
         (when-let [[{:keys [x y width height text type dir on-top] :as shape} & more] (seq shapes)]
           (do (when (<= @xcur x)
                 (swap! shapes-text str (fill \space (- x @xcur))))
@@ -201,10 +201,10 @@
                                       :down char-line-vertic)
                                :rect (if (= 1 width)
                                          (if (> x @xcur)
-                                             (if (< y ypos) char-bow-bottom-left char-bow-top-left)
+                                             (if (< y ypos) char-elbow-bottom-left char-elbow-top-left)
                                              (if (< y ypos) 
-                                                 char-bow-bottom-right
-                                                 (if (= 1 height) char-line-vertic char-bow-top-right)))
+                                                 char-elbow-bottom-right
+                                                 (if (= 1 height) char-line-vertic char-elbow-top-right)))
                                          (if (< y ypos)
                                              (if (< x @xcur) char-corner-bottom-right char-corner-bottom-left)
                                              (if (< x @xcur) char-corner-top-right char-corner-top-left))))
@@ -214,7 +214,7 @@
                              (when (> width 1)
                                (if (>= y ypos)
                                    (if (= height 1)
-                                       char-bow-top-right
+                                       char-elbow-top-right
                                        char-corner-top-right)
                                    char-corner-bottom-right)))
                         (str (if (> width 1)
